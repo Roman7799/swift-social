@@ -8,6 +8,10 @@
 
 import UIKit
 
+// GLOBALS
+var current_user: NSMutableDictionary?
+// GLOBALS END
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
