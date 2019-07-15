@@ -8,6 +8,7 @@
 
 import UIKit
 
+// To dismiss keyboard on tap. Include this code only once per project
 extension UIViewController{
     
     func Hide_Keyboard_on_Tap(){
@@ -280,11 +281,20 @@ class RegisterVC: UIViewController {
         let helper = Helper()
         
         let gender = String(sender.tag)
+        let date_formatter = DateFormatter()
+        date_formatter.dateFormat = "Y-m-d"
         
+        let date = date_formatter.string(from: datePicker.date)
         
-        helper.api_register_user(email: Email_EmailInput.text!, password: Password_PasswordInput.text!, first_name: Name_FirstNameInput.text!, last_name: Name_LastNameInput.text!, birthday: Birthday_BirthdayInput.text!, gender: gender, target_view: self, on_complete: { result in
+        helper.api_register_user(email: Email_EmailInput.text!, password: Password_PasswordInput.text!, first_name: Name_FirstNameInput.text!, last_name: Name_LastNameInput.text!, birthday: date, gender: gender, target_view: self, on_complete: { result in
             // Go to Tabs like after login?
             print("REGISTER END POINT", result)
+            current_user["id"] = Int(result.value(forKey: "content.id") as! String)
+            current_user["first_name"] = result.value(forKey: "content.first_name") as! String
+            current_user["last_name"] = result.value(forKey: "content.last_name") as! String
+            current_user["birthday"] = result.value(forKey: "content.birthday") as! String
+            current_user["gender"] = result.value(forKey: "content.gender") as! String
+            UserDefaults.standard.set(current_user, forKey: "current_user")
         })
         
     }

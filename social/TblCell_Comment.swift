@@ -8,17 +8,21 @@
 
 import UIKit
 
-class Tbl_Cell_Comment: UITableViewCell {
-
+class TblCell_Comment: UITableViewCell {
+    
+    var helper = Helper()
+    
+    var id = Int()
+    var user_id = String()
+    @IBOutlet weak var Comment_Avatar: UIImageView!
+    @IBOutlet weak var Comment_Text: UILabel!
+    @IBOutlet weak var Comment_Fullname: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        
+        helper.configure_avatar_post(element: Comment_Avatar)
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
 
 }

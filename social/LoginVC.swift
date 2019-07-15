@@ -183,17 +183,27 @@ class LoginVC: UIViewController {
                 print("ON COMPLETE LAST")
                 print(result)
                 
-                let content: NSDictionary = result.object(forKey: "content") as! NSDictionary
-                let user_id: Int = Int(content.object(forKey: "id") as! String)!
-                print("CONTENT(NSDICT):", content)
-                print("USER_ID(INT)", user_id)
+                // This also works
+                //let content: NSDictionary = result.object(forKey: "content") as! NSDictionary
+                //let user_id: Int = Int(content.object(forKey: "id") as! String)!
+                //print("CONTENT(NSDICT):", content)
+                //print("USER_ID(INT)", user_id)
                 
                 if(result.value(forKeyPath: "content.id") != nil){
-                    print("ID FOUND")
-                    //let user_id = result.value(forKeyPath: "content.id")
-                    //current_user
+                
+                                    print("ID FOUND")
+                    let user_id = result.value(forKeyPath: "content.id")
+                
+                    current_user["user_id"] = user_id
+                    print("USER OBJ TO STORE", current_user)
                     
-                    let user_id =
+                    UserDefaults.standard.set(current_user, forKey: "current_user")
+                    //UserDefaults.standard.synchronize()
+                    
+                    // TEST stored user
+                    let user_tmp = UserDefaults.standard.object(forKey: "current_user")
+                    print("TEST STORED USER", user_tmp)
+                    
                     self.helper.instantinate_view_controller(id: "Tab_bar", animated: true, by: self, on_complete: nil)
                 }
                 
@@ -203,6 +213,11 @@ class LoginVC: UIViewController {
 
     @IBAction func forgot_pass_clicked(_ sender: Any) {
         print("forgot_pass_clicked")
+        
+        // Test UserDefaults
+        let tmp = UserDefaults.standard.integer(forKey: "uid")
+        print(tmp)
+        UserDefaults.standard.set(34, forKey: "uid")
     }
     
     

@@ -9,7 +9,8 @@
 import UIKit
 
 // GLOBALS
-var current_user: NSMutableDictionary?
+var current_user: NSMutableDictionary = [:]
+var current_user_avatar: UIImage = UIImage()
 // GLOBALS END
 
 @UIApplicationMain
@@ -20,6 +21,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Get saved (sessioned) user
+        let stored_user = UserDefaults.standard.object(forKey: "current_user") as? NSMutableDictionary
+        if(stored_user != nil){
+            current_user = stored_user!
+        }
+        print("INIT current_user = ", current_user)
+        
+        // Get VC from storyboard and make it root (starting)
+        if(current_user["user_id"] != nil){
+            let home_vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "Tab_bar")
+            window?.rootViewController = home_vc
+        }
+        
         return true
     }
 

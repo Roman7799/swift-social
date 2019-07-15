@@ -8,12 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		3311765322BB955E00F89645 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3311765222BB955E00F89645 /* LoginVC.swift */; };
+		331A08FA22CE18240084FA3C /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331A08F922CE18240084FA3C /* HomeVC.swift */; };
+		332DB47A22CF92E600FBE77E /* BiographyVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332DB47922CF92E600FBE77E /* BiographyVC.swift */; };
+		3352311922D77121008D8635 /* CommentsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3352311822D77121008D8635 /* CommentsVC.swift */; };
+		33806F0E22D36C1F004E29FB /* PostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33806F0D22D36C1F004E29FB /* PostVC.swift */; };
+		33817E7222D4982600CB93ED /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33817E7122D4982600CB93ED /* EditProfileVC.swift */; };
+		338E57D522D5F82A00EE51AE /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E57D422D5F82A00EE51AE /* Settings.swift */; };
+		338E57D722D6036800EE51AE /* TblCell_Post_Plain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E57D622D6036800EE51AE /* TblCell_Post_Plain.swift */; };
+		338E57D922D6038A00EE51AE /* TblCell_Post_Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E57D822D6038A00EE51AE /* TblCell_Post_Image.swift */; };
 		338E998822B0ECFA00236012 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338E998722B0ECFA00236012 /* AppDelegate.swift */; };
 		338E998D22B0ECFA00236012 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 338E998B22B0ECFA00236012 /* Main.storyboard */; };
 		338E998F22B0ED2000236012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 338E998E22B0ED2000236012 /* Assets.xcassets */; };
 		338E999222B0ED2000236012 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 338E999022B0ED2000236012 /* LaunchScreen.storyboard */; };
 		3394410422CB802600D9158D /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 339440F522CB7FDF00D9158D /* Alamofire.framework */; };
 		3394410522CB802600D9158D /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 339440F522CB7FDF00D9158D /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		33A55C5A22D8941500BD441C /* TblCell_Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A55C5922D8941500BD441C /* TblCell_Comment.swift */; };
+		33A55C6422D89B7400BD441C /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A55C6322D89B7400BD441C /* Comment.swift */; };
 		33CB325622C0C70800B8BA63 /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CB325522C0C70800B8BA63 /* RegisterVC.swift */; };
 		33CB325822C10FD400B8BA63 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CB325722C10FD400B8BA63 /* Helper.swift */; };
 		33E4373B22B12A3A00509E7C /* image_placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E4373A22B12A3A00509E7C /* image_placeholder.png */; };
@@ -94,6 +104,14 @@
 
 /* Begin PBXFileReference section */
 		3311765222BB955E00F89645 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
+		331A08F922CE18240084FA3C /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
+		332DB47922CF92E600FBE77E /* BiographyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiographyVC.swift; sourceTree = "<group>"; };
+		3352311822D77121008D8635 /* CommentsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsVC.swift; sourceTree = "<group>"; };
+		33806F0D22D36C1F004E29FB /* PostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostVC.swift; sourceTree = "<group>"; };
+		33817E7122D4982600CB93ED /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
+		338E57D422D5F82A00EE51AE /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		338E57D622D6036800EE51AE /* TblCell_Post_Plain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TblCell_Post_Plain.swift; sourceTree = "<group>"; };
+		338E57D822D6038A00EE51AE /* TblCell_Post_Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TblCell_Post_Image.swift; sourceTree = "<group>"; };
 		338E998422B0ECFA00236012 /* social.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = social.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		338E998722B0ECFA00236012 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		338E998C22B0ECFA00236012 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -101,6 +119,8 @@
 		338E999122B0ED2000236012 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		338E999322B0ED2000236012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		339440E922CB7FDE00D9158D /* Alamofire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Alamofire.xcodeproj; path = "Alamofire-4.8.0/Alamofire.xcodeproj"; sourceTree = "<group>"; };
+		33A55C5922D8941500BD441C /* TblCell_Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TblCell_Comment.swift; sourceTree = "<group>"; };
+		33A55C6322D89B7400BD441C /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		33CB325522C0C70800B8BA63 /* RegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
 		33CB325722C10FD400B8BA63 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		33E4373A22B12A3A00509E7C /* image_placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = image_placeholder.png; path = ../../../../assets/image_placeholder.png; sourceTree = "<group>"; };
@@ -139,6 +159,7 @@
 		338E998622B0ECFA00236012 /* social */ = {
 			isa = PBXGroup;
 			children = (
+				33A55C6222D89B4700BD441C /* classes */,
 				33E4373622B1299200509E7C /* assets */,
 				338E998722B0ECFA00236012 /* AppDelegate.swift */,
 				338E998B22B0ECFA00236012 /* Main.storyboard */,
@@ -148,6 +169,15 @@
 				3311765222BB955E00F89645 /* LoginVC.swift */,
 				33CB325522C0C70800B8BA63 /* RegisterVC.swift */,
 				33CB325722C10FD400B8BA63 /* Helper.swift */,
+				331A08F922CE18240084FA3C /* HomeVC.swift */,
+				332DB47922CF92E600FBE77E /* BiographyVC.swift */,
+				33806F0D22D36C1F004E29FB /* PostVC.swift */,
+				33817E7122D4982600CB93ED /* EditProfileVC.swift */,
+				338E57D422D5F82A00EE51AE /* Settings.swift */,
+				338E57D622D6036800EE51AE /* TblCell_Post_Plain.swift */,
+				338E57D822D6038A00EE51AE /* TblCell_Post_Image.swift */,
+				3352311822D77121008D8635 /* CommentsVC.swift */,
+				33A55C5922D8941500BD441C /* TblCell_Comment.swift */,
 			);
 			path = social;
 			sourceTree = "<group>";
@@ -171,6 +201,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		33A55C6222D89B4700BD441C /* classes */ = {
+			isa = PBXGroup;
+			children = (
+				33A55C6322D89B7400BD441C /* Comment.swift */,
+			);
+			path = classes;
 			sourceTree = "<group>";
 		};
 		33E4373622B1299200509E7C /* assets */ = {
@@ -321,9 +359,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				332DB47A22CF92E600FBE77E /* BiographyVC.swift in Sources */,
 				33CB325622C0C70800B8BA63 /* RegisterVC.swift in Sources */,
+				33A55C5A22D8941500BD441C /* TblCell_Comment.swift in Sources */,
+				33A55C6422D89B7400BD441C /* Comment.swift in Sources */,
+				3352311922D77121008D8635 /* CommentsVC.swift in Sources */,
+				331A08FA22CE18240084FA3C /* HomeVC.swift in Sources */,
+				338E57D722D6036800EE51AE /* TblCell_Post_Plain.swift in Sources */,
 				3311765322BB955E00F89645 /* LoginVC.swift in Sources */,
+				33806F0E22D36C1F004E29FB /* PostVC.swift in Sources */,
 				338E998822B0ECFA00236012 /* AppDelegate.swift in Sources */,
+				338E57D522D5F82A00EE51AE /* Settings.swift in Sources */,
+				33817E7222D4982600CB93ED /* EditProfileVC.swift in Sources */,
+				338E57D922D6038A00EE51AE /* TblCell_Post_Image.swift in Sources */,
 				33CB325822C10FD400B8BA63 /* Helper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
