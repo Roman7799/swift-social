@@ -76,15 +76,25 @@ class CommentsVC: UIViewController, UITextViewDelegate, UITableViewDelegate, UIT
         /* OBSERVERS */
         
         // on keyboard will show
-        NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_show(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_show(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_show(notification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
         
         // on keyboard will hide
-        NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_hide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_hide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.addObserver(self, selector: #selector(on_keyboard_will_hide(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         /* OBSERVERS END */
         
         // Dynamic table cell height
-        Comments_Table.rowHeight = UITableView.automaticDimension
+        // 10.1
+        //Comments_Table.rowHeight = UITableView.automaticDimension
+        // 9.2
+        Comments_Table.rowHeight = UITableViewAutomaticDimension
         Comments_Table.estimatedRowHeight = 70
         
     }
@@ -100,10 +110,16 @@ class CommentsVC: UIViewController, UITextViewDelegate, UITableViewDelegate, UIT
         // OBSERVERS REMOVE
         
         // on keyboard will show (remove event)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         
         // on keyboard will hide (remove event)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         // OBSERVERS REMOVE END
     }
@@ -160,6 +176,11 @@ class CommentsVC: UIViewController, UITextViewDelegate, UITableViewDelegate, UIT
         
         return cell
      }
+    
+    // Allow to edit cells
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
      
     
     /* Table Data END */
@@ -207,6 +228,9 @@ class CommentsVC: UIViewController, UITextViewDelegate, UITableViewDelegate, UIT
                     let index_path = IndexPath(row: index, section: 0)
                     self.Comments_Table.insertRows(at: [index_path], with: .automatic)
                     self.Comments_Table.endUpdates()
+                    
+                    // Scroll to index
+                    self.Comments_Table.scrollToRow(at: index_path, at: .bottom, animated: true)
                 }
             }
         })
@@ -218,7 +242,10 @@ class CommentsVC: UIViewController, UITextViewDelegate, UITableViewDelegate, UIT
     // on keyboard will show
     @objc func on_keyboard_will_show(notification: Notification){
         if(keyboard_is_hidden){
-            if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            // 10.1
+            //if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+            // 9.2
+            if let keyboard_size = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue
             {
                 print("Keyb height = \(keyboard_size.height)")
                 Comment_Input_bottom.constant += keyboard_size.height

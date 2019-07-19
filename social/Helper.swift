@@ -300,7 +300,10 @@ class Helper{
                 return
             }
             
-            if let image_data = image.jpegData(compressionQuality: 0.7){
+            // 10.1
+            //if let image_data = image.jpegData(compressionQuality: 0.7){
+            // 9.2
+            if let image_data = UIImageJPEGRepresentation(image, 0.7){
                 form_data.append(image_data, withName: "file")
             }else{
                 print("IMAGA DATA FAILED")
@@ -375,7 +378,10 @@ class Helper{
             }
             
             for (key, image) in images{
-                if let image_data = image.jpegData(compressionQuality: 0.7){
+                // 10.1
+                //if let image_data = image.jpegData(compressionQuality: 0.7){
+                // 9.2
+                if let image_data = UIImageJPEGRepresentation(image, 0.7){
                     form_data.append(image_data, withName: "file\(key)")
                 }else{
                     print("IMAGA DATA FAILED")

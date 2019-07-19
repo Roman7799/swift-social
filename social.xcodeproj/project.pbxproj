@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -26,7 +26,6 @@
 		33A55C6422D89B7400BD441C /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A55C6322D89B7400BD441C /* Comment.swift */; };
 		33CB325622C0C70800B8BA63 /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CB325522C0C70800B8BA63 /* RegisterVC.swift */; };
 		33CB325822C10FD400B8BA63 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CB325722C10FD400B8BA63 /* Helper.swift */; };
-		33E4373B22B12A3A00509E7C /* image_placeholder.png in Resources */ = {isa = PBXBuildFile; fileRef = 33E4373A22B12A3A00509E7C /* image_placeholder.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,7 +122,6 @@
 		33A55C6322D89B7400BD441C /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		33CB325522C0C70800B8BA63 /* RegisterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
 		33CB325722C10FD400B8BA63 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
-		33E4373A22B12A3A00509E7C /* image_placeholder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = image_placeholder.png; path = ../../../../assets/image_placeholder.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -222,7 +220,6 @@
 		33E4373722B129A500509E7C /* images */ = {
 			isa = PBXGroup;
 			children = (
-				33E4373A22B12A3A00509E7C /* image_placeholder.png */,
 			);
 			path = images;
 			sourceTree = "<group>";
@@ -261,11 +258,12 @@
 				TargetAttributes = {
 					338E998322B0ECFA00236012 = {
 						CreatedOnToolsVersion = 10.1;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
 			buildConfigurationList = 338E997F22B0ECFA00236012 /* Build configuration list for PBXProject "social" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -346,7 +344,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				338E999222B0ED2000236012 /* LaunchScreen.storyboard in Resources */,
-				33E4373B22B12A3A00509E7C /* image_placeholder.png in Resources */,
 				338E998F22B0ED2000236012 /* Assets.xcassets in Resources */,
 				338E998D22B0ECFA00236012 /* Main.storyboard in Resources */,
 			);
@@ -529,10 +526,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = social/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = app.social;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -547,10 +542,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = social/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = app.social;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;

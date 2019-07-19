@@ -101,10 +101,17 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
     /* HOOKS */
     
     // Triggers after image was picked from library
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        
+    // 10.1
+    //func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    // 9.2
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         //let user_id = current_user["user_id"] as! String
-        let image = info[.editedImage] as? UIImage
+        
+        // 10.1
+        //let image = info[.editedImage] as? UIImage
+        // 9.2
+        let image = info[UIImagePickerControllerEditedImage] as? UIImage
+        
         if(image == nil){
             print("image IS nil")
             return
@@ -194,7 +201,10 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         self.present(sheet, animated: true, completion: nil)
     }
     
-    func show_image_picker(source: UIImagePickerController.SourceType){
+    // 10.1
+    //func show_image_picker(source: UIImagePickerController.SourceType){
+    // 9.2
+    func show_image_picker(source: UIImagePickerControllerSourceType){
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true

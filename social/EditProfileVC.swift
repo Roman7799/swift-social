@@ -203,9 +203,15 @@ class EditProfileVC: UITableViewController
     /* HOOKS */
     
     // Triggers after image was picked from library
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    // 10.1
+    //func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    // 9.2
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         //let user_id = Int(current_user["user_id"] as! String)!
-        let image = info[.editedImage] as? UIImage
+        
+        //let image = info[.editedImage] as? UIImage
+        let image = info[UIImagePickerControllerEditedImage] as? UIImage
+        
         if(image == nil){
             print("image IS nil")
             return
@@ -404,7 +410,10 @@ class EditProfileVC: UITableViewController
         self.present(sheet, animated: true, completion: nil)
     }
     
-    func show_image_picker(source: UIImagePickerController.SourceType){
+    // 10.1
+    //func show_image_picker(source: UIImagePickerController.SourceType){
+    // 9.2
+    func show_image_picker(source: UIImagePickerControllerSourceType){
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true

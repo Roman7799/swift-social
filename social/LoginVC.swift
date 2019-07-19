@@ -44,9 +44,16 @@ class LoginVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super .viewDidAppear(animated)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(notification:)), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 10.1
+        //NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        // 9.2
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -70,7 +77,10 @@ class LoginVC: UIViewController {
             Top_Image_Bg_constraint_top.constant -= 75
             
             // Get keyboard size. if true, change register button bottom
-            if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            // 10.1
+            //if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            // 9.2
+            if let keyboard_size = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
                 print("Keyb height = \(keyboard_size.height)")
                 registerButton_constraint_bottom.constant += keyboard_size.height
             }
@@ -95,7 +105,10 @@ class LoginVC: UIViewController {
             Top_Image_Bg_constraint_top.constant = orig_Top_Image_Bg_constraint_top
             
             // Get keyboard size. if true, change register button bottom
-            if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            // 10.1
+            //if let keyboard_size = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            // 9.2
+            if let keyboard_size = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
                 print("Keyb height = \(keyboard_size.height)")
                 registerButton_constraint_bottom.constant -= keyboard_size.height
             }
