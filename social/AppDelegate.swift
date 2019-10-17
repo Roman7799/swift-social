@@ -2,15 +2,31 @@
 //  AppDelegate.swift
 //  social
 //
-//  Created by Ancient on 6/12/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 6/12/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
 
 // GLOBALS
-var current_user: NSMutableDictionary = [:]
-var current_user_avatar: UIImage = UIImage()
+var current_user = NSMutableDictionary()
+/*
+ current_user possible values
+ "user_id"
+ "email"
+ "first_name"
+ "last_name"
+ "birthday"
+ "gender"
+ "avatar" - url
+ "cover" - url
+ "allow_friends"
+ "allow_follow"
+ ! NSNull cant be stored! Use only string
+ */
+var current_user_avatar: UIImage? = nil
+
+var cache_image = NSCache<NSString, UIImage>()
 // GLOBALS END
 
 @UIApplicationMain
@@ -25,9 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Get saved (sessioned) user
-        let stored_user = UserDefaults.standard.object(forKey: "current_user") as? NSMutableDictionary
+        var stored_user = UserDefaults.standard.object(forKey: "current_user") as? NSMutableDictionary
         if(stored_user != nil){
-            current_user = stored_user!
+            current_user = stored_user!.mutableCopy() as! NSMutableDictionary
         }
         print("INIT current_user = ", current_user)
         
@@ -63,5 +79,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 
+}
+
+
+extension UIButton {
+    
+    // adjust the icon and title's position
+    func centerVertically(gap: CGFloat) {
+        
+        // adjust title's width
+        self.contentEdgeInsets = UIEdgeInsets(top: 0, left: -20, bottom: 0, right: -20)
+        
+        // vertical position of title
+        let padding = self.frame.height + gap
+        
+        // accessing sizes
+        let imageSize = self.imageView!.frame.size
+        let titleSize = self.titleLabel!.frame.size
+        let totalHeight = imageSize.height + titleSize.height + padding
+        
+        // applying the final apperance of the icon's insets
+        self.imageEdgeInsets = UIEdgeInsets(top: -(totalHeight - imageSize.height), left: 0, bottom: 0, right: -titleSize.width)
+        
+        // applying the final position of title by vertical
+        self.titleEdgeInsets = UIEdgeInsets(top: 0, left: -imageSize.width, bottom: -(totalHeight - titleSize.height), right: 0)
+        
+    }
 }
 

@@ -2,8 +2,8 @@
 //  RegisterVC.swift
 //  social
 //
-//  Created by Ancient on 6/24/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 6/24/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
@@ -25,6 +25,9 @@ extension UIViewController{
 }
 
 class RegisterVC: UIViewController {
+    
+    let helper = Helper()
+    let settings = Settings()
     
     // Constraints
     @IBOutlet weak var ContentView_width: NSLayoutConstraint!
@@ -74,10 +77,20 @@ class RegisterVC: UIViewController {
         GenderView_width.constant = self.view.frame.width
         
         
-        roundCorners(for: Email_EmailInput)
-        roundCorners(for: Email_ContinueBtn)
+        //roundCorners(for: Email_EmailInput)
+        //roundCorners(for: Email_ContinueBtn)
         
         padding_textfield(for: Email_EmailInput)
+        
+        helper.style_border_radius(element: Email_EmailInput, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Email_ContinueBtn, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Name_FirstNameInput, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Name_LastNameInput, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Name_ContinueBtn, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Password_PasswordInput, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Password_ContionueBtn, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Birthday_BirthdayInput, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Birthday_ContinueBtn, value: 10, clip_to_bounds: false, mask_to_bounds: true)
         
         datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
@@ -127,7 +140,7 @@ class RegisterVC: UIViewController {
         print("SWIPE RIGHT")
         print("CURRENT_SLIDE = " + String(current_slide))
         let helper = Helper()
-        if(current_slide >= 1){
+        if(current_slide > 1){
             print("SLIDE TRIGGERED")
             current_slide -= 1
             helper.set_scroll_horizontal_position(scrollView: ScrollView, slide_num: current_slide)
@@ -146,12 +159,14 @@ class RegisterVC: UIViewController {
     }
     
     func configure_GenderButtons(for genderBtn: UIButton){
-        let border = CALayer()
-        border.borderColor = UIColor.lightGray.cgColor
-        border.borderWidth = 1
-        border.frame = CGRect(x: 0, y: 0, width: genderBtn.frame.width, height: genderBtn.frame.height)
         
-        genderBtn.layer.addSublayer(border)
+        // Border
+//        let border = CALayer()
+//        border.borderColor = UIColor.lightGray.cgColor
+//        border.borderWidth = 1
+//        border.frame = CGRect(x: 0, y: 0, width: genderBtn.frame.width, height: genderBtn.frame.height)
+//        genderBtn.layer.addSublayer(border)
+        // Border End
         
         
     }
@@ -174,16 +189,20 @@ class RegisterVC: UIViewController {
         }
         
         if(textField === Name_FirstNameInput || textField === Name_LastNameInput){
-            if(helper.isValid(name: textField.text!) && helper.isValid(name: textField.text!)){
+            if(helper.isValid(name: Name_FirstNameInput.text!) && helper.isValid(name: Name_LastNameInput.text!)){
                 print("VALID")
                 Name_ContinueBtn.isHidden = false
+            }else{
+                Name_ContinueBtn.isHidden = true
             }
         }
         
         if(textField === Password_PasswordInput){
-            if(helper.isValid(name: textField.text!) && textField.text!.count >= 6){
+            if(helper.isValid(password: textField.text!) && textField.text!.count >= 6){
                 print("VALID")
                 Password_ContionueBtn.isHidden = false
+            }else{
+                Password_ContionueBtn.isHidden = true
             }
         }
     }
@@ -193,6 +212,7 @@ class RegisterVC: UIViewController {
         let date_formatter = DateFormatter()
         date_formatter.dateStyle = DateFormatter.Style.medium
         Birthday_BirthdayInput.text = date_formatter.string(from: datePicker.date)
+        print("DATE:", datePicker.date)
         
         let max_date = Calendar.current.date(byAdding: .year, value: -5, to: Date())!
         let compare_date_formatter = DateFormatter()
@@ -248,7 +268,7 @@ class RegisterVC: UIViewController {
     @IBAction func PasswordView_continueBtn_clicked(_ sender: Any) {
         let helper = Helper()
         current_slide = 4
-        if(helper.isValid(name: Password_PasswordInput.text!)){
+        if(helper.isValid(password: Password_PasswordInput.text!) && Password_PasswordInput.text!.count >= 6){
             helper.set_scroll_horizontal_position(scrollView: ScrollView, slide_num: current_slide)
             if(Birthday_BirthdayInput.text!.isEmpty){
                 Birthday_BirthdayInput.becomeFirstResponder()
@@ -282,19 +302,68 @@ class RegisterVC: UIViewController {
         
         let gender = String(sender.tag)
         let date_formatter = DateFormatter()
-        date_formatter.dateFormat = "Y-m-d"
+        date_formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
         let date = date_formatter.string(from: datePicker.date)
         
         helper.api_register_user(email: Email_EmailInput.text!, password: Password_PasswordInput.text!, first_name: Name_FirstNameInput.text!, last_name: Name_LastNameInput.text!, birthday: date, gender: gender, target_view: self, on_complete: { result in
             // Go to Tabs like after login?
             print("REGISTER END POINT", result)
-            current_user["id"] = Int(result.value(forKey: "content.id") as! String)
-            current_user["first_name"] = result.value(forKey: "content.first_name") as! String
-            current_user["last_name"] = result.value(forKey: "content.last_name") as! String
-            current_user["birthday"] = result.value(forKey: "content.birthday") as! String
-            current_user["gender"] = result.value(forKey: "content.gender") as! String
-            UserDefaults.standard.set(current_user, forKey: "current_user")
+            if(result["status"] as! Int == 1){
+                
+                let content = result["content"] as! NSDictionary
+                
+                /*
+                let ready_data: NSMutableDictionary = [
+                    "user_id": result.value(forKey: "content.id"),
+                    "first_name": result.value(forKey: "content.first_name")!,
+                    "last_name": result.value(forKey: "content.last_name")!,
+                    "birthday": result.value(forKey: "content.birthday")!,
+                    "gender": result.value(forKey: "content.gender")!
+                ]
+                 */
+                var ready_data: NSMutableDictionary = [:
+                    //"user_id": helper.cast(value: content["id"]),
+//                    "first_name": helper.cast(value: content["first_name"]),
+//                    "last_name": helper.cast(value: content["last_name"]),
+//                    "birthday": helper.cast(value: content["birthday"]),
+//                    "gender": helper.cast(value: content["gender"]),
+                    //"cover": helper.cast(value: content["cover"]),
+                    //"avatar": helper.cast(value: content["avatar"])
+                ]
+                ready_data["user_id"] = helper.cast(value: content["id"])
+                ready_data["email"] = helper.cast(value: content["email"])
+                ready_data["first_name"] = helper.cast(value: content["first_name"])
+                ready_data["last_name"] = helper.cast(value: content["last_name"])
+                ready_data["birthday"] = helper.cast(value: content["birthday"])
+                ready_data["gender"] = helper.cast(value: content["gender"])
+                ready_data["allow_friends"] = helper.cast(value: content["allow_friends"])
+                ready_data["allow_follow"] = helper.cast(value: content["allow_follow"])
+                ready_data["cover"] = helper.cast(value: content["cover"])
+                ready_data["avatar"] = helper.cast(value: content["avatar"])
+                /*
+                if(content["cover"] is NSNull){
+                    print("empty trigger")
+                    ready_data["cover"] = nil
+                }else{
+                    ready_data["cover"] = content["cover"]
+                }
+                if(content["avatar"] is NSNull){
+                    ready_data["avatar"] = nil
+                }else{
+                    ready_data["avatar"] = content["avatar"]
+                }
+                */
+                current_user = ready_data.mutableCopy() as! NSMutableDictionary
+                
+                print(current_user)
+                UserDefaults.standard.set(current_user, forKey: "current_user")
+                UserDefaults.standard.synchronize()
+                helper.instantinate_view_controller(id: "Tab_bar", animated: true, by: self, on_complete: nil)
+            }else{
+                // show error
+                helper.show_alert_ok(title: "Error", message: result["error"] as! String, target_view: self)
+            }
         })
         
     }

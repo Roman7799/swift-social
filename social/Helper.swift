@@ -2,7 +2,7 @@
 
 import UIKit
 import Alamofire
-
+import Photos
 
 class Helper{
     var api_base_url: String
@@ -42,6 +42,24 @@ class Helper{
         let converted = formatter.string(from: date)
         return converted
     }
+    
+    // Cast value to string or nil
+    func cast(value: Any?) -> String{
+        //print("CAST value is", type(of: value))
+        if value is NSNull || value == nil{ // value in NSNull
+            return "" as String!
+        }else{
+            let cast = "\(value!)"
+            return cast as String!
+            
+//            if(value is NSString || value is String){
+//                let cast = "\(value)"
+//                return cast
+//            }
+        }
+    }
+
+ 
     
     // Valid email
     func isValid(email: String) -> Bool{
@@ -88,9 +106,134 @@ class Helper{
         
     }
     
+    // Download image from url
+    func download_image(url: URL, on_complete: @escaping (_ image: UIImage) -> Void, on_fail: @escaping () -> Void = {})
+    {
+        print("DOWNLOAD START")
+        
+        //
+        //let test_url = URL(string: "https://swift-social.pria.digital/uploads/19/cover/image.jpg")!
+        
+        /*
+         
+         
+         */
+        
+        DispatchQueue.global().async {
+            do{
+                print("FILE URL:", url)
+                if let image = cache_image.object(forKey: url.absoluteString as NSString) {
+                    print("USED CACHED")
+                    on_complete(image)
+                }else{
+                    let data = try Data(contentsOf: url)
+                    DispatchQueue.main.async {
+                        if let image = UIImage(data: data){
+                            cache_image.setObject(image, forKey: url.absoluteString as NSString)
+                            print("DOWNLOAD COMPLETE")
+                            on_complete(image)
+                        }else{
+                            print("NOT IMAGE")
+                            on_fail()
+                        }
+                        
+                    }
+                }
+                
+                
+                
+            }catch{
+                print("DOWNLOAD FAILED", error)
+                on_fail()
+            }
+        }
+        
+        /*
+        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+            guard let data = data, error == nil else {
+                print("DOWNLOAD FAILED", error)
+                return
+            }
+            //print(response?.suggestedFilename ?? url.lastPathComponent)
+            
+            DispatchQueue.main.async() {
+                if let image = UIImage(data: data){
+                    print("DOWNLOAD FINISHED")
+                    on_complete(image)
+                }else{
+                    print("DOWNLOAD FAILED - DATA NOT IMAGE")
+                }
+                
+            }
+        }).resume()
+        */
+    }
+    
+    // Get access for photo library
+    func access_photo(on_success: @escaping () -> Void, on_denied: @escaping () -> Void) {
+        let photoAuthorizationStatus = PHPhotoLibrary.authorizationStatus()
+        switch photoAuthorizationStatus {
+        case .authorized:
+            print("photo library authorized")
+            on_success()
+            break
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization({
+                (newStatus) in print("status is \(newStatus)")
+                if newStatus == PHAuthorizationStatus.authorized {
+                    print("photo library access granted")
+                    on_success()
+                }else{
+                    print("photo library access rejected")
+                    on_denied()
+                }
+            })
+            break
+        case .restricted:
+            print("User do not have access to photo album.")
+            on_denied()
+            break
+        case .denied:
+            print("User has denied the permission.")
+            on_denied()
+            break
+        }
+    }
+    
+    // Find parents of element of certain class
+    func find_parent<T>(child: AnyObject, search_class: T.Type) -> AnyObject?{
+        
+        var child = child as AnyObject?
+        
+        while(child != nil && child is T == false){
+            child = child!.superview as AnyObject?
+        }
+        if (child as? UITableViewCell) == nil {
+            return nil
+        }else{
+            return child!
+        }
+        
+        /* Original working, but not in func
+         var table_cell = sender.superview
+         while(table_cell is UITableViewCell == false){
+         table_cell = table_cell?.superview
+         }
+         if (table_cell as? UITableViewCell) == nil {
+         return
+         }
+         let post_id = "\(table_cell!.tag)"
+         */
+    }
+    
     /***************** INTERFACE *****************/
     
     func configure_avatar_post(element: UIView){
+        element.layer.cornerRadius = element.frame.width / 2
+        element.clipsToBounds = true
+    }
+    
+    func style_image_round(element: UIView){
         element.layer.cornerRadius = element.frame.width / 2
         element.clipsToBounds = true
     }
@@ -184,21 +327,21 @@ class Helper{
     
     func api_send_request_2(command: String, data: [String: Any], target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void) {
         
+        //print("api_send_request_2")
         
-        print(api_send_request_2)
         let url = URL(string: self.api_base_command + command + ".php" )!
         var data = data
         data.updateValue("DBGTOKEN", forKey: "token")
-        print("DATA FOR POST:", data)
+        print("$_POST:", data)
         
-        print("AF START")
+        //print("AF START")
         let request = Alamofire.request(url, method: .post, parameters: data)
         request.validate()
         request.responseJSON{ (response)->Void in
-            print("AF RESPONSE:", response)
+            //print("AF RESPONSE:", response)
             switch response.result {
             case .success(let data as NSDictionary):
-                print(data)
+                //print(data)
                 on_complete(data)
                 break
                 
@@ -277,9 +420,10 @@ class Helper{
         */
     }
     
+    // API Upload request for single image
     func api_upload(command: String, image: UIImage, data: [String: Any], target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
         
-        print("api_upload")
+        print("api_upload (single image)")
         let url = URL(string: self.api_base_command + command + ".php" )!
         
         var data = data
@@ -293,7 +437,9 @@ class Helper{
             
             do{
                 let json = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
+                print("UPLOAD SINGLE JSON DATA", json)
                 form_data.append(json as Data, withName: "json")
+                print("UPLOAD SINGLE FORM DATA", form_data)
                 
             }catch{
                 print("JSON SERIALIZATION FAILED")
@@ -305,6 +451,7 @@ class Helper{
             // 9.2
             if let image_data = UIImageJPEGRepresentation(image, 0.7){
                 form_data.append(image_data, withName: "file")
+                print("UPLOAD SINGLE FORM DATA + IMAGE", form_data)
             }else{
                 print("IMAGA DATA FAILED")
                 return
@@ -323,6 +470,8 @@ class Helper{
                 })
                 
                 upload.responseJSON(completionHandler: {(response) in
+                    
+                    print("UPLOAD RESPONSE:", response)
                     
                     switch response.result{
                     case .success(let data as NSDictionary):
@@ -370,7 +519,9 @@ class Helper{
             
             do{
                 let json = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
+                print("UPLOAD DATA JSON", json)
                 form_data.append(json as Data, withName: "json")
+                print("UPLOAD FORM DATA:", form_data)
                 
             }catch{
                 print("JSON SERIALIZATION FAILED")
@@ -431,6 +582,68 @@ class Helper{
         })
         
     }
+    
+    // Test another upload
+    func api_upload_v2(command: String, images: [String: UIImage], data: [String: Any], target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        print("api_upload (v2)")
+        let url = URL(string: self.api_base_command + command + ".php" )!
+        
+        var data = data
+        data.updateValue("DBGTOKEN", forKey: "token")
+
+        print("DATA FOR POST:", data)
+        print("AF START")
+        Alamofire.upload(
+            multipartFormData: { MultipartFormData in
+                //    multipartFormData.append(imageData, withName: "user", fileName: "user.jpg", mimeType: "image/jpeg")
+                
+                // Add data to form
+                for (key, value) in data {
+                    /*
+                    if let cast = value as? String{
+                        let value_string = cast
+                    }else if let cast = value as? Int{
+                        let value_string = String(cast)
+                    }
+                    */
+                    let val_str = String(describing: value);
+                    MultipartFormData.append(val_str.data(using: String.Encoding.utf8)!, withName: key)
+                }
+                
+                // Add images to form
+                var fileindex = 0
+                for (key, image) in images{
+                    print("IMAGE FOR FORM", image)
+                    MultipartFormData.append(UIImageJPEGRepresentation(image, 1)!, withName: "\(key)", fileName: "\(key).jpeg", mimeType: "image/jpeg")
+                    fileindex += 1
+                }
+                
+                //MultipartFormData.append(UIImageJPEGRepresentation(UIImage(named: "1.png")!, 1)!, withName: "file2", fileName: "swift_file.jpeg", mimeType: "image/jpeg")
+                print("FORM DATA:", MultipartFormData)
+                
+        }, to: url) { (result) in
+            
+            switch result {
+            case .success(let upload, _, _):
+                print("REQUEST SUCCESS")
+                
+                upload.responseJSON { response in
+                    print("UPLOAD RESPONSE", response)
+                    on_complete(response.result.value as! NSDictionary)
+                    //print(response.result.value)
+                }
+                
+            case .failure(let encodingError):
+                print("REQUEST FAIL", encodingError)
+                break
+            }
+            
+            
+        }
+        
+    }
+    
     // Base END
     
     
@@ -464,10 +677,140 @@ class Helper{
         })
     }
     
-    func api_upload_image_of_type(user_id: Int, type: String, image: UIImage, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void){
+    func api_search_user(current_user_id: String, search_value: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        print("api_search_user start")
+        
+        let search: [String: Any] = [
+            "relation": "OR",
+            "fields": [
+                "1": [
+                    "field": "first_name",
+                    "value": search_value
+                ],
+                "2": [
+                    "field": "last_name",
+                    "value": search_value
+                ]
+            ]
+        ]
+        let data:[String:Any] = ["current_user_id":current_user_id, "search": search]
+        
+        print("$_POST", data)
+        
+        self.api_send_request_2(command: "/search_user", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+        
+    }
+    
+    func api_add_friend_request(current_user_id: String, target_user_id: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "target_user_id": target_user_id]
+        
+        self.api_send_request_2(command: "/add_friend_request", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    // Remove own sent friend request
+    func api_delete_friend_request(current_user_id: String, target_user_id: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "target_user_id": target_user_id]
+        
+        self.api_send_request_2(command: "/delete_friend_request", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    func api_get_friends(user_id: String, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_get_friend_requests START")
+        let data:[String:Any] = ["user_id": user_id, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/get_friends", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_get_friend_requests(current_user_id: String, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_get_friend_requests START")
+        let data:[String:Any] = ["user_id": current_user_id, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/get_friend_requests", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_get_friend_recommended(current_user_id: String, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_get_friend_recommended START")
+        let data:[String:Any] = ["current_user_id": current_user_id, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/get_recommended_users", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_confirm_friend_request(current_user_id: String, friend_id: String, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_confirm_friend_request START")
+        let data:[String:Any] = ["current_user_id": current_user_id, "friend_id": friend_id]
+        
+        self.api_send_request_2(command: "/friend_accept", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_decline_friend_request(current_user_id: String, friend_id: String, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_confirm_friend_request START")
+        let data:[String:Any] = ["current_user_id": current_user_id, "friend_id": friend_id]
+        
+        self.api_send_request_2(command: "/friend_decline", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_delete_friend(current_user_id: String, friend_id: String, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_delete_friend START")
+        let data:[String:Any] = ["current_user_id": current_user_id, "friend_id": friend_id]
+        
+        self.api_send_request_2(command: "/friend_delete", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    
+    func api_add_follow(current_user_id: String, target_user_id: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "target_user_id": target_user_id]
+        
+        self.api_send_request_2(command: "/follow", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    func api_delete_follow(current_user_id: String, target_user_id: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "target_user_id": target_user_id]
+        
+        self.api_send_request_2(command: "/unfollow", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    func api_upload_image_of_type(user_id: Int, type: String, images: [String: UIImage], target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void){
         print("api_upload_image_of_type START")
         let data:[String:Any] = ["id": user_id, "type": type]
-        self.api_upload(command: "/upload_image", image: image, data: data, target_view: target_view, on_complete: {(result) in
+        self.api_upload_v2(command: "/upload_image", images: images, data: data, target_view: target_view, on_complete: {(result) in
             on_complete(result)
         })
     }
@@ -494,10 +837,13 @@ class Helper{
         print("api_create_post START")
         let data:[String:Any] = ["id": user_id, "text": text]
         if(image != nil){
-            self.api_upload(command: "/create_post", image: image!, data: data, target_view: target_view, on_complete: {(result) in
+            print("api_create_post->no image")
+            let images = ["file0": image!]
+            self.api_upload_v2(command: "/create_post", images: images, data: data, target_view: target_view, on_complete: {(result) in
                 on_complete(result)
             })
         }else{
+            print("api_create_post->with image")
             self.api_send_request_2(command: "/create_post", data: data, target_view: target_view, on_complete: {(result) in
                 on_complete(result)
             })
@@ -508,33 +854,58 @@ class Helper{
     // API Get posts by user id
     func api_get_posts(user_id: String, limit: Int, offset: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
     {
-        let data:[String:Any] = ["id": user_id, "offset": offset, "limit": limit]
+        guard let current_user_id = current_user["user_id"] as? String else{
+            self.show_alert_ok(title: "Error", message: "No current user", target_view: target_view)
+            return
+        }
+        let data:[String:Any] = ["id": user_id, "current_user_id": current_user_id, "offset": offset, "limit": limit]
         
         self.api_send_request_2(command: "/get_posts", data: data, target_view: target_view, on_complete: {result in
             on_complete(result)
         })
     }
     
-    // Send API request to create a post
-    func api_update_user_info(user_id: String, password: String = "", first_name: String, last_name: String, birthday: String, gender: String, cover: UIImage?, is_cover_deleted: Bool, avatar: UIImage?, is_avatar_deleted: Bool, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    // API Get posts by user id
+    func api_get_feed_posts(user_id: String, limit: Int, offset: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
     {
-        print("api_create_post START")
-        var data:[String:Any] = ["id": user_id, "first_name": first_name, "last_name": last_name, "birthday": birthday, "gender": gender]
+
+        let data:[String:Any] = ["user_id": user_id, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/get_posts_for_feed", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    // Send request to delete post
+    func api_delete_post(current_user_id: String, post_id: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id": current_user_id, "post_id": post_id]
+        
+        self.api_send_request_2(command: "/delete_post", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    // Send API request to create a post
+    func api_update_user_info(user_id: String, email: String, password: String = "", first_name: String, last_name: String, birthday: String, gender: String, allow_friends: String, allow_follow: String,  cover: UIImage?, is_cover_deleted: Bool, avatar: UIImage?, is_avatar_deleted: Bool, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_update_user_info START")
+        var data:[String:Any] = ["id": user_id, "email": email, "first_name": first_name, "last_name": last_name, "birthday": birthday, "gender": gender, "allow_friends": allow_friends, "allow_follow": allow_follow]
         if(password != ""){
             data["password"] = password
         }
         
         var images = [String: UIImage]()
-        if(cover == nil){
+        if(cover != nil){
             images["cover"] = cover!
         }
-        if(avatar == nil){
+        if(avatar != nil){
             images["avatar"] = avatar!
         }
         data["is_cover_deleted"] = is_cover_deleted
         data["is_avatar_deleted"] = is_avatar_deleted
         
-        api_upload(command: "/update_profile", images: images, data: data, target_view: target_view, on_complete: {result in
+        api_upload_v2(command: "/update_profile", images: images, data: data, target_view: target_view, on_complete: {result in
             on_complete(result)
         })
         
@@ -560,11 +931,89 @@ class Helper{
         })
     }
     
-    func api_get_posts_comments_by_post_id(post_id: Int, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void){
+    func api_delete_comment(current_user_id: String, comment_id: String, user_id: String, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void){
+    
+        print("api_delete_comment START")
+        let data:[String:Any] = ["current_user_id": current_user_id, "comment_id": comment_id]
+        
+        self.api_send_request_2(command: "/delete_comment", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+        
+    }
+    
+    // Get comment for post by post_id
+    func api_get_posts_comments_by_post_id(current_user_id: String, post_id: Int, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void){
         print("api_get_posts_comments_by_post_id START")
-        let data:[String:Any] = ["post_id": post_id, "offset": offset, "limit": limit]
+        let data:[String:Any] = ["user_id": current_user_id, "post_id": post_id, "offset": offset, "limit": limit, "orderby": "date_created", "order": "DESC"]
         
         self.api_send_request_2(command: "/get_comments_by_post", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    // Add report
+    func api_add_report(current_user_id: String, user_id: String, post_id: String, reason: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "user_id": user_id, "post_id": post_id, "reason": reason]
+        
+        self.api_send_request_2(command: "/add_report", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    func api_get_notifications(current_user_id: String, type: String, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "type": type, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/get_notifications", data: data, target_view: target_view, on_complete: { result in
+            
+            on_complete(result)
+        })
+    }
+    
+    // MARK: - CHAT
+    
+    func api_chat_get(user_id: String, offset: Int, limit: Int, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_get_friend_recommended START")
+        let data:[String:Any] = ["user_id": user_id, "offset": offset, "limit": limit]
+        
+        self.api_send_request_2(command: "/chat/chat_get", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_chat_messages_get(chat_id: String, user_id: String, user2_id: String = "-1", offset: Int, limit: Int, order: String, last_id: String = "", target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_chat_messages_get START")
+        let data:[String:Any] = ["chat_id": chat_id, "user_id": user_id, "user2_id": user2_id, "offset": offset, "limit": limit, "order": order, "last_id": last_id]
+        
+        self.api_send_request_2(command: "/chat/messages_get", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    func api_chat_message_add(chat_id: String, user_id: String, type: String, content: String, target_view: UIViewController, on_complete: @escaping (_ result:NSDictionary) -> Void)
+    {
+        print("api_chat_message_add START")
+        let data:[String:Any] = ["chat_id": chat_id, "user_id": user_id, "type": type, "content": content]
+        
+        self.api_send_request_2(command: "/chat/message_add", data: data, target_view: target_view, on_complete: {result in
+            on_complete(result)
+        })
+    }
+    
+    // MARK: - 
+    
+    
+    func api_update_notification(current_user_id: String, notification_id: String, viewed: String, target_view: UIViewController, on_complete: @escaping (_ result: NSDictionary) -> Void){
+        
+        let data:[String:Any] = ["current_user_id":current_user_id, "notification_id": notification_id, "viewed": viewed]
+        
+        self.api_send_request_2(command: "/update_notification", data: data, target_view: target_view, on_complete: { result in
+            
             on_complete(result)
         })
     }

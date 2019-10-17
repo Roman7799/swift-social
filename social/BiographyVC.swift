@@ -2,8 +2,8 @@
 //  BiographyVC.swift
 //  social
 //
-//  Created by Ancient on 7/5/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 7/5/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
@@ -17,6 +17,8 @@ class BiographyVC: UIViewController, UITextViewDelegate {
     @IBOutlet weak var CharCount_Label: UILabel!
     
     let helper = Helper()
+    let settings = Settings()
+    let allowed = 100
     
     
     
@@ -36,23 +38,39 @@ class BiographyVC: UIViewController, UITextViewDelegate {
         // Bio
         if let biography = current_user["biography"] as? String{
             Text_Input.text = biography
+            if biography.isEmpty == false{
+                Placeholder_Label.isHidden = true
+            }
+            
+            CharCount_Label.text = "\(biography.count)/\(allowed)"
         }
         // Avatar
         if let avatar_url = current_user["avatar"] as? String{
             if(avatar_url.isEmpty == false){
-                let url = URL(fileURLWithPath: avatar_url)
+                print("AVATAR URL NOT EMPTY", avatar_url)
+                let url = URL(string: avatar_url)!
                 
-                DispatchQueue.main.async {
-                    do{
-                        let data = try Data(contentsOf: url)
-                        if let image = UIImage(data: data){
-                            self.Avatar_Image.image = image
-                        }
-                    }catch{
-                        print("CANT GET AVATAR IMAGE. URL:", url)
-                    }
+                if(current_user_avatar == nil){
+                    // No stored Avatar
+                    print("NO STORED AVATAR")
+                    helper.download_image(url: url, on_complete: {(image) in
+                        self.Avatar_Image.image = image
+                        current_user_avatar = image
+                        print("AVATAR RETRIEVED")
+                    })
+                    
+                }else{
+                    // Stored Avatar exists
+                    self.Avatar_Image.image = current_user_avatar!
+                    print("STORED AVATAR:", current_user_avatar!)
                 }
+                
+                
+            }else{
+                self.Avatar_Image.image = UIImage(named: settings.default_avatar)
             }
+        }else{
+            self.Avatar_Image.image = UIImage(named: settings.default_avatar)
         }
         // current_user END
         
@@ -99,8 +117,8 @@ class BiographyVC: UIViewController, UITextViewDelegate {
     
     // On before typing
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        print("BEFORE TYPING")
         
-        let allowed = 100
         //let typed = textView.text.count
         //let remain = allowed - typed
         
@@ -119,7 +137,12 @@ class BiographyVC: UIViewController, UITextViewDelegate {
             return false
         }
         
-        return textView.text.count + (text.count - range.length) <= allowed
+        if(textView.text.count + (text.count - range.length) <= allowed){
+            CharCount_Label.text = "\(textView.text.count + (text.count - range.length))/\(allowed)"
+            return true
+        }else{
+            return false
+        }
     }
     
     /* INTERACTIONS END */

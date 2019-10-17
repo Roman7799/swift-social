@@ -2,8 +2,8 @@
 //  TblCell_Post_Plain.swift
 //  social
 //
-//  Created by Ancient on 7/10/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 7/10/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
@@ -16,6 +16,7 @@ class TblCell_Post_Plain: UITableViewCell {
     @IBOutlet weak var Post_Text: UILabel!
     @IBOutlet weak var Like: UIButton!
     @IBOutlet weak var Comments: UIButton!
+    @IBOutlet weak var Post_Options: UIButton!
     
     let helper = Helper()
     let settings = Settings()

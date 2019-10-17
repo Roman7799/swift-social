@@ -2,8 +2,8 @@
 //  LoginVC.swift
 //  social
 //
-//  Created by Ancient on 6/20/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 6/20/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
@@ -14,7 +14,6 @@ class LoginVC: UIViewController {
     //@IBOutlet weak var Top_Image_Bg_constraint_height: NSLayoutConstraint!
     @IBOutlet weak var Top_Image_Bg_constraint_top: NSLayoutConstraint!
     
-    @IBOutlet weak var textFieldsView: UIView!
     @IBOutlet weak var Login_Input: UITextField!
     @IBOutlet weak var Password_Input: UITextField!
     
@@ -69,8 +68,8 @@ class LoginVC: UIViewController {
     }
     
     @objc func keyboardWillShowNotification(notification: Notification){
-        print("SHOW")
-        print("keyboard_is_hidden = ", keyboard_is_hidden)
+        print("WILL SHOW")
+        //print("keyboard_is_hidden = ", keyboard_is_hidden)
         
         if(keyboard_is_hidden == true){
             keyboard_is_hidden = false
@@ -87,7 +86,6 @@ class LoginVC: UIViewController {
             
             UIView.animate(withDuration: 0.5, animations: {
                 self.Top_Image_Bg.alpha = 0
-                
                 self.view.layoutIfNeeded() // Relayout constraints if values was changed
             })
         }
@@ -110,12 +108,11 @@ class LoginVC: UIViewController {
             // 9.2
             if let keyboard_size = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
                 print("Keyb height = \(keyboard_size.height)")
-                registerButton_constraint_bottom.constant -= keyboard_size.height
+                registerButton_constraint_bottom.constant = orig_registerButton_constraint_bottom
             }
             
             UIView.animate(withDuration: 0.5, animations: {
                 self.Top_Image_Bg.alpha = 1
-                
                 self.view.layoutIfNeeded() // Relayout constraints if values was changed
             })
         }
@@ -127,48 +124,43 @@ class LoginVC: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        configure_textFieldsView()
-        configure_loginButton()
-        configure_registerButton()
+        configure()
+        //configure_loginButton()
+        //configure_registerButton()
     }
     
     // Login an Password View appearence config
-    func configure_textFieldsView(){
+    func configure(){
         
-        let border_width = CGFloat(2)
-        let border_color = UIColor.groupTableViewBackground.cgColor
+        //let border_width = CGFloat(2)
+        //let border_color = UIColor.groupTableViewBackground.cgColor
         
         // Border around Login and Password View
-        let border = CALayer()
-        border.borderColor = border_color
-        border.borderWidth = border_width
-        border.frame = CGRect(x: 0, y: 0, width: textFieldsView.frame.width, height: textFieldsView.frame.height)
+        //let border = CALayer()
+        //border.borderColor = border_color
+        //border.borderWidth = border_width
+        //border.frame = CGRect(x: 0, y: 0, width: textFieldsView.frame.width, height: textFieldsView.frame.height)
         
         // Line between Login and Password fields
-        let line = CALayer()
-        line.borderWidth = border_width
-        line.borderColor = border_color
-        line.frame = CGRect(x: 0, y: textFieldsView.frame.height / 2 - border_width, width: textFieldsView.frame.width, height: border_width)
+        //let line = CALayer()
+        //line.borderWidth = border_width
+        //line.borderColor = border_color
+        //line.frame = CGRect(x: 0, y: textFieldsView.frame.height / 2 - border_width, width: textFieldsView.frame.width, height: border_width)
         
         // Attach layers to Login and Password View
-        textFieldsView.layer.addSublayer(border)
-        textFieldsView.layer.addSublayer(line)
+        //textFieldsView.layer.addSublayer(border)
+        //textFieldsView.layer.addSublayer(line)
         
         // Border radius
-        textFieldsView.layer.masksToBounds = true
-        textFieldsView.layer.cornerRadius = 5
-    }
-    
-    // Login button appearance config
-    func configure_loginButton(){
-        loginButton.layer.masksToBounds = true
-        loginButton.layer.cornerRadius = 5
-        //loginButton.isEnabled = false
-    }
-    
-    // Register button appearance config
-    func configure_registerButton(){
-
+        //textFieldsView.layer.masksToBounds = true
+        //textFieldsView.layer.cornerRadius = 10
+        
+        helper.style_border_radius(element: Login_Input, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: Password_Input, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        helper.style_border_radius(element: loginButton, value: 10, clip_to_bounds: false, mask_to_bounds: true)
+        
+        //loginButton.layer.masksToBounds = true
+        //loginButton.layer.cornerRadius = 10
     }
     
     
@@ -188,8 +180,10 @@ class LoginVC: UIViewController {
         
         if(helper.isValid(email: login) == false){
             print("LOGIN NOT VALID")
+            helper.show_alert_ok(title: "Error", message: "Login not valid", target_view: self)
         }else if(helper.isValid(password: password) == false){
             print("PASSWORD NOT VALID")
+            helper.show_alert_ok(title: "Error", message: "Password not valid", target_view: self)
         }else{
             print("ALL VALID")
             helper.api_login_user(email: login, password: password, target_view: self, on_complete: { result in
@@ -202,22 +196,35 @@ class LoginVC: UIViewController {
                 //print("CONTENT(NSDICT):", content)
                 //print("USER_ID(INT)", user_id)
                 
-                if(result.value(forKeyPath: "content.id") != nil){
-                
-                                    print("ID FOUND")
-                    let user_id = result.value(forKeyPath: "content.id")
-                
-                    current_user["user_id"] = user_id
+                if(result["status"] as! Int == 1){
+                    // User found
+                    
+                    let content = result["content"] as! NSDictionary
+                    let user_id = content["id"]
+                    print("ID FOUND")
+                    
+                    var ready_data: NSMutableDictionary = [:]
+                    ready_data["user_id"] = self.helper.cast(value: content["id"])
+                    ready_data["email"] = self.helper.cast(value: content["email"])
+                    ready_data["first_name"] = self.helper.cast(value: content["first_name"])
+                    ready_data["last_name"] = self.helper.cast(value: content["last_name"])
+                    ready_data["birthday"] = self.helper.cast(value: content["birthday"])
+                    ready_data["gender"] = self.helper.cast(value: content["gender"])
+                    ready_data["allow_friends"] = self.helper.cast(value: content["allow_friends"])
+                    ready_data["allow_follow"] = self.helper.cast(value: content["allow_follow"])
+                    ready_data["cover"] = self.helper.cast(value: content["cover"])
+                    ready_data["avatar"] = self.helper.cast(value: content["avatar"])
+                    
+                    current_user = ready_data.mutableCopy() as! NSMutableDictionary
                     print("USER OBJ TO STORE", current_user)
                     
                     UserDefaults.standard.set(current_user, forKey: "current_user")
-                    //UserDefaults.standard.synchronize()
-                    
-                    // TEST stored user
-                    let user_tmp = UserDefaults.standard.object(forKey: "current_user")
-                    print("TEST STORED USER", user_tmp)
+                    UserDefaults.standard.synchronize()
                     
                     self.helper.instantinate_view_controller(id: "Tab_bar", animated: true, by: self, on_complete: nil)
+                }else{
+                    // User not found
+                    self.helper.show_alert_ok(title: "Error", message: result["error"] as! String, target_view: self)
                 }
                 
             })

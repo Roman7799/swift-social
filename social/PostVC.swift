@@ -2,8 +2,8 @@
 //  PostVC.swift
 //  social
 //
-//  Created by Ancient on 7/8/19.
-//  Copyright © 2019 Ancient. All rights reserved.
+//  Created by Geolance on 7/8/19.
+//  Copyright © 2019 Geolance. All rights reserved.
 //
 
 import UIKit
@@ -20,11 +20,14 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
     @IBOutlet weak var Post_Image: UIImageView!
     
     
-    
+    let picker = UIImagePickerController()
     let helper = Helper()
+    let settings = Settings()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        picker.delegate = self
         
         self.Hide_Keyboard_on_Tap()
         
@@ -87,12 +90,16 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         
         helper.api_create_post(user_id: user_id, text: text, image: image, target_view: self, on_complete: {result in
             print("SHARE RESULT:", result)
+            
+            if(result["status"] as! Int == 1){
+                // Send event to other controllers
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "post_created"), object: nil)
+                
+                self.dismiss(animated: true, completion: nil)
+            }else{
+                self.helper.show_alert_ok(title: "Error", message: result["error"] as! String, target_view: self)
+            }
 
-            // Send event to other controllers
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "post_created"), object: nil)
-            
-            self.dismiss(animated: true, completion: nil)
-            
         })
     }
 
@@ -148,18 +155,27 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
         // Avatar
         if let avatar_url = current_user["avatar"] as? String{
             if(avatar_url.isEmpty == false){
-                let url = URL(fileURLWithPath: avatar_url)
+                print("AVATAR URL NOT EMPTY", avatar_url)
+                let url = URL(string: avatar_url)!
                 
-                DispatchQueue.main.async {
-                    do{
-                        let data = try Data(contentsOf: url)
-                        if let image = UIImage(data: data){
-                            self.Avatar.image = image
-                        }
-                    }catch{
-                        print("CANT GET AVATAR IMAGE. URL:", url)
-                    }
+                if(current_user_avatar == nil){
+                    // No stored Avatar
+                    print("NO STORED AVATAR")
+                    helper.download_image(url: url, on_complete: {(image) in
+                        self.Avatar.image = image
+                        current_user_avatar = image
+                        print("AVATAR RETRIEVED")
+                    })
+                    
+                }else{
+                    // Stored Avatar exists
+                    print("STORED AVATAR:", current_user_avatar!)
+                    self.Avatar.image = current_user_avatar
                 }
+                
+                
+            }else{
+                self.Avatar.image = UIImage(named: settings.default_avatar)
             }
         }
         
@@ -205,11 +221,20 @@ class PostVC: UIViewController, UIImagePickerControllerDelegate, UINavigationCon
     //func show_image_picker(source: UIImagePickerController.SourceType){
     // 9.2
     func show_image_picker(source: UIImagePickerControllerSourceType){
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        picker.allowsEditing = true
-        picker.sourceType = source
-        present(picker, animated: true, completion: nil)
+        if(source == .photoLibrary){
+            helper.access_photo(on_success: {
+                self.picker.allowsEditing = true
+                self.picker.sourceType = source
+                self.present(self.picker, animated: true, completion: nil)
+            }, on_denied: {
+                self.helper.show_alert_ok(title: "Error", message: "Photo library access not granted", target_view: self)
+            })
+        }else{
+            picker.allowsEditing = true
+            picker.sourceType = source
+            present(picker, animated: true, completion: nil)
+        }
+        
     }
     
     /* OTHER END */
